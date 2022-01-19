@@ -1,69 +1,79 @@
-//Genuary 1/20/2022 Sea of Shapes
+//SOME GRAVITY CODE SOURCED FROM http://learningprocessing.com/examples/chp05/example-05-09-gravity
 
+float i = 450;
+float birdY = 0;
+float birdSpeed = 0;
+float birdGrav = 0.2;
+float randoH = 200;
+int birdX = 100;
+int oldCounter = 0;
+int currCounter = 0;
+int timer = 0;
 
 void setup() {
   size(500, 500);
-  background(0);
-
 }
 
 void draw() {
-  shape();
-  waves();
-}
-
-void waves() {
+  background(0);
 
   fill(255);
-  stroke(255);
-  int x = 0;
-  int y = 250;
-  beginShape();
+  ellipse(birdX, birdY, 40, 40); //bird
 
-  for (int i = 0; i < 6; i++) {
-    vertex(x, y);
-    bezierVertex(x+35, y, x+60, y-20, x+75, y-75);
-    vertex(x+75, y-75);
-    bezierVertex(x+110, y-50, x+120, y-20, x+80, y);
-    vertex(x+80, y);
-    x+=80;
-  }
+  birdY += birdSpeed;
+  birdSpeed += birdGrav; //setting up gravity
+
+  fill(100, 255, 100);
+  rect(i, 0, 50, randoH);
+  rect(i, 500-randoH, 50, randoH); //drawing the pipes
   
-  vertex(480,250);
-  vertex(500,250);
-  vertex(500,0);
-  vertex(0,0);
-  vertex(0,250);
-
-  endShape();
-
+  fill(0);
+  rect(5,0,210,50); //box background for instructions
+  
   fill(255);
   textSize(20);
-  text(mouseX + ", " + mouseY, 10, 30);
+  text("UP ARROW TO BOUNCE", 10,20);
+  text("SHIFT TO BOOST", 10,40); //instructions in top left
+
+  if (birdX == i && (birdY < randoH || birdY > 500-randoH)) {
+    currCounter++;
+    timer = 200;
+  } //collision detection - bird and pipes
+
+  if (currCounter > oldCounter && timer > 0) {
+    textSize(50);
+    fill(255, 0, 0);
+    text("YOU LOST", 100, 100);
+    timer--; //marking when collision is detected
+    oldCounter++;
+  }
+
+  if (i > -50) {
+    fill(100, 255, 100);
+    rect(i, 300, 50, 225);
+    i -= 2;
+  } else {
+    i = 450;
+    randoH = (float)Math.random()*200;
+  } //code to make pipes move left
+
+  if (birdY < 20) {
+    birdY = 20;
+  } //stops bird from going off top of screen
+  
+  if(birdY > 460) {
+    currCounter++;
+    timer = 200;
+  }
 }
 
-void shape() {
-  waves();
-  noStroke();
-  int x = (int)(Math.random()*500);
-  int y = (int)(Math.random()*500);
-  int w = (int)(Math.random()*50);
-  int h = (int)(Math.random()*50);
-
-  int c = (int)(Math.random()*4);
-
-  if (c == 1) {
-    fill(150, 185, 250);
-    rect(x, y, w, h);
-  }
-
-  if (c == 2) {
-    fill(150, 240, 250);
-    ellipse(x, y, w, h);
-  }
-
-  if (c == 3) {
-    fill(90, 130, 215);
-    triangle(x, y, x+5, y+15, x-5, y+15);
+void keyPressed() { //taking care of bird bounce/gravity
+  if (key == CODED) {
+    if (keyCode == UP && birdSpeed > 0.1) {
+      birdSpeed*= -0.9;
+    }
+    if (keyCode == SHIFT && birdSpeed > 0.1) {
+      birdSpeed*=-1.1;
+    }
   }
 }
